@@ -65,6 +65,7 @@ export default function POSPage() {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showComprobanteModal, setShowComprobanteModal] = useState(false);
+  const [showMobileCart, setShowMobileCart] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<MetodoPago>("efectivo");
   const [clienteSeleccionado, setClienteSeleccionado] = useState<Cliente | null>(null);
   const [showClienteModal, setShowClienteModal] = useState(false);
@@ -277,8 +278,8 @@ export default function POSPage() {
         </div>
       </header>
 
-      <div className="flex h-[calc(100vh-4rem)]">
-        {/* Products Section */}
+      <div className="flex flex-col lg:flex-row h-[calc(100vh-4rem)] pb-20 lg:pb-0">
+        {/* Products Section - visible en todas las pantallas */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Search and Categories */}
           <div className="p-4 space-y-4 border-b bg-card">
@@ -395,11 +396,11 @@ export default function POSPage() {
                 <p className="text-sm">Intenta con otro término de búsqueda</p>
               </div>
             )}
-          </ScrollArea>
+        </ScrollArea>
         </div>
 
-        {/* Cart Section */}
-        <div className="w-full max-w-md border-l bg-card flex flex-col">
+        {/* Cart Section - Oculto en móvil, visible en desktop */}
+        <div className="hidden lg:flex w-full max-w-md border-l bg-card flex-col">
           {/* Cart Header */}
           <div className="p-4 border-b">
             <div className="flex items-center justify-between">
@@ -844,6 +845,126 @@ export default function POSPage() {
                 Imprimir
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Mobile Cart Bar - Fixed bottom bar for mobile */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 p-4 border-t bg-card/95 backdrop-blur z-50">
+        <div className="flex items-center justify-between gap-4">
+          <Button
+            variant="outline"
+            onClick={() => setShowMobileCart(true)}
+            className="flex-1 gap-2"
+          >
+            <ShoppingCart className="h-5 w-5" />
+            <span>{totalItems} items</span>
+            {totalItems > 0 && (
+              <Badge variant="secondary">S/ {total.toFixed(2)}</Badge>
+            )}
+          </Button>
+          <Button
+            onClick={() => setShowPaymentModal(true)}
+            disabled={items.length === 0}
+            className="flex-1 font-semibold"
+          >
+            Cobrar S/ {total.toFixed(2)}
+          </Button>
+        </div>
+      </div>
+
+      {/* Mobile Cart Modal */}
+      <Dialog open={showMobileCart} onOpenChange={setShowMobileCart}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ShoppingCart className="h-5 w-5" />
+              Carrito ({totalItems} items)
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            {items.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <ShoppingCart className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                <p>Carrito vacío</p>
+              </div>
+            ) : (
+              <>
+                <ScrollArea className="h-[300px]">
+                  <div className="space-y-3">
+                    {items.map((item) => (
+                      <div
+                        key={item.producto.id}
+                        className="flex items-center gap-3 p-3 rounded-lg border"
+                      >
+                        <div className="flex-1">
+                          <p className="font-medium text-sm">{item.producto.nombre}</p>
+                          <p className="text-sm text-muted-foreground">
+                            S/ {item.precio_unitario.toFixed(2)} x {item.cantidad}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => updateQuantity(item.producto.id, item.cantidad - 1)}
+                          >
+                            <Minus className="h-3 w-3" />
+                          </Button>
+                          <span className="w-8 text-center font-medium">{item.cantidad}</span>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => updateQuantity(item.producto.id, item.cantidad + 1)}
+                          >
+                            <Plus className="h-3 w-3" />
+                          </Button>
+                        </div>
+                        <p className="font-semibold text-primary w-20 text-right">
+                          S/ {item.subtotal.toFixed(2)}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollArea>
+                
+                <Separator />
+                
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Subtotal</span>
+                    <span>S/ {(total / 1.18).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">IGV (18%)</span>
+                    <span>S/ {(total - total / 1.18).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-lg font-bold">
+                    <span>Total</span>
+                    <span className="text-primary">S/ {total.toFixed(2)}</span>
+                  </div>
+                </div>
+                
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={clearCart} className="flex-1">
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Vaciar
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      setShowMobileCart(false);
+                      setShowPaymentModal(true);
+                    }}
+                    className="flex-1"
+                  >
+                    Cobrar
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         </DialogContent>
       </Dialog>
