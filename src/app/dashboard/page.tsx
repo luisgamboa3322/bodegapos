@@ -28,12 +28,6 @@ export default function DashboardPage() {
     setMounted(true);
   }, []);
 
-  const ventas = generarVentasDemo(30);
-  const productosStockBajo = productosDemo.filter(
-    (p) => p.stock_actual <= p.stock_minimo
-  );
-  const ventasRecientes = ventas.slice(0, 5);
-
   // Pantalla de carga mientras se monta el componente
   if (!mounted) {
     return (
@@ -47,6 +41,13 @@ export default function DashboardPage() {
       </DashboardLayout>
     );
   }
+
+  // Generar datos SOLO después de que el componente esté montado
+  const ventas = generarVentasDemo(30);
+  const productosStockBajo = productosDemo.filter(
+    (p) => p.stock_actual <= p.stock_minimo
+  );
+  const ventasRecientes = ventas.slice(0, 5);
 
   const stats = [
     {

@@ -49,7 +49,6 @@ export default function ReportesPage() {
   }, []);
 
   const [periodoSeleccionado, setPeriodoSeleccionado] = useState("hoy");
-  const ventas = generarVentasDemo(50);
 
   // Pantalla de carga mientras se monta el componente
   if (!mounted) {
@@ -64,6 +63,9 @@ export default function ReportesPage() {
       </DashboardLayout>
     );
   }
+
+  // Generar ventas SOLO después de que el componente esté montado
+  const ventas = generarVentasDemo(50);
 
   const handleExport = () => {
     exportVentasCSV(ventas);

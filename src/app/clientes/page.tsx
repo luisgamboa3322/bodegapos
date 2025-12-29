@@ -60,6 +60,18 @@ export default function ClientesPage() {
   const [showClienteModal, setShowClienteModal] = useState(false);
   const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null);
 
+  // Filtrar clientes - DEBE estar ANTES de cualquier return condicional
+  const clientesFiltrados = useMemo(() => {
+    if (!searchQuery) return clientesDemo;
+    const query = searchQuery.toLowerCase();
+    return clientesDemo.filter(
+      (c) =>
+        c.nombre.toLowerCase().includes(query) ||
+        c.dni?.includes(query) ||
+        c.telefono?.includes(query)
+    );
+  }, [searchQuery]);
+
   // Pantalla de carga mientras se monta el componente
   if (!mounted) {
     return (
@@ -78,18 +90,6 @@ export default function ClientesPage() {
     exportClientesCSV(clientesFiltrados);
     toast.success("Clientes exportados a CSV");
   };
-
-  // Filtrar clientes
-  const clientesFiltrados = useMemo(() => {
-    if (!searchQuery) return clientesDemo;
-    const query = searchQuery.toLowerCase();
-    return clientesDemo.filter(
-      (c) =>
-        c.nombre.toLowerCase().includes(query) ||
-        c.dni?.includes(query) ||
-        c.telefono?.includes(query)
-    );
-  }, [searchQuery]);
 
   const stats = [
     {

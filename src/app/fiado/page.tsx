@@ -51,9 +51,21 @@ export default function FiadoPage() {
   const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null);
   const [montoPago, setMontoPago] = useState("");
 
+  // TODOS los useMemo DEBEN estar ANTES de cualquier return condicional
   const clientesConFiado = useMemo(() => {
     return clientesDemo.filter((c) => c.saldo_fiado > 0);
   }, []);
+
+  const clientesFiltrados = useMemo(() => {
+    if (!searchQuery) return clientesConFiado;
+    const query = searchQuery.toLowerCase();
+    return clientesConFiado.filter(
+      (c) =>
+        c.nombre.toLowerCase().includes(query) ||
+        c.dni?.includes(query) ||
+        c.telefono?.includes(query)
+    );
+  }, [searchQuery, clientesConFiado]);
 
   // Pantalla de carga mientras se monta el componente
   if (!mounted) {
@@ -68,18 +80,6 @@ export default function FiadoPage() {
       </DashboardLayout>
     );
   }
-
-  // Filtrar clientes
-  const clientesFiltrados = useMemo(() => {
-    if (!searchQuery) return clientesConFiado;
-    const query = searchQuery.toLowerCase();
-    return clientesConFiado.filter(
-      (c) =>
-        c.nombre.toLowerCase().includes(query) ||
-        c.dni?.includes(query) ||
-        c.telefono?.includes(query)
-    );
-  }, [searchQuery, clientesConFiado]);
 
   const totalFiado = clientesConFiado.reduce((sum, c) => sum + c.saldo_fiado, 0);
 

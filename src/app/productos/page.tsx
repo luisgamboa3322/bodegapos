@@ -67,26 +67,7 @@ export default function ProductosPage() {
   const [showProductModal, setShowProductModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<typeof productosConCategoria[0] | null>(null);
 
-  // Pantalla de carga mientras se monta el componente
-  if (!mounted) {
-    return (
-      <DashboardLayout>
-        <div className="min-h-[60vh] flex items-center justify-center">
-          <div className="text-center space-y-4">
-            <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
-            <p className="text-muted-foreground">Cargando productos...</p>
-          </div>
-        </div>
-      </DashboardLayout>
-    );
-  }
-
-  const handleExport = () => {
-    exportProductosCSV(productosFiltrados);
-    toast.success("Productos exportados a CSV");
-  };
-
-  // Filtrar productos
+  // Filtrar productos - DEBE estar ANTES de cualquier return condicional
   const productosFiltrados = useMemo(() => {
     let productos = productosConCategoria;
 
@@ -111,6 +92,25 @@ export default function ProductosPage() {
 
     return productos;
   }, [categoriaFilter, stockFilter, searchQuery]);
+
+  // Pantalla de carga mientras se monta el componente
+  if (!mounted) {
+    return (
+      <DashboardLayout>
+        <div className="min-h-[60vh] flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
+            <p className="text-muted-foreground">Cargando productos...</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  const handleExport = () => {
+    exportProductosCSV(productosFiltrados);
+    toast.success("Productos exportados a CSV");
+  };
 
   const stats = [
     {

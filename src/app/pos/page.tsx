@@ -97,19 +97,7 @@ export default function POSPage() {
   const totalItems = getTotalItems();
   const vuelto = montoRecibido ? parseFloat(montoRecibido) - total : 0;
 
-  // Pantalla de carga mientras se monta el componente
-  if (!mounted) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
-          <p className="text-muted-foreground">Cargando Punto de Venta...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Filtrar productos
+  // Filtrar productos - DEBE estar ANTES de cualquier return condicional
   const productosFiltrados = useMemo(() => {
     let productos = productosConCategoria;
 
@@ -129,7 +117,7 @@ export default function POSPage() {
     return productos;
   }, [categoriaActiva, searchQuery]);
 
-  // Filtrar clientes
+  // Filtrar clientes - DEBE estar ANTES de cualquier return condicional
   const clientesFiltrados = useMemo(() => {
     if (!clienteSearch) return clientesDemo;
     const query = clienteSearch.toLowerCase();
@@ -140,6 +128,18 @@ export default function POSPage() {
         c.telefono?.includes(query)
     );
   }, [clienteSearch]);
+
+  // Pantalla de carga mientras se monta el componente
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
+          <p className="text-muted-foreground">Cargando Punto de Venta...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleAddProduct = (producto: Producto) => {
     if (producto.stock_actual <= 0) {
