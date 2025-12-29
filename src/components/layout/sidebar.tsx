@@ -87,11 +87,11 @@ export function Sidebar() {
         />
       )}
 
-      {/* Mobile menu button */}
+      {/* Mobile menu button - visible y con fondo */}
       <Button
-        variant="ghost"
+        variant="outline"
         size="icon"
-        className="fixed top-4 left-4 z-50 lg:hidden"
+        className="fixed top-4 left-4 z-50 lg:hidden bg-card border-border shadow-lg"
         onClick={toggleSidebar}
       >
         {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}

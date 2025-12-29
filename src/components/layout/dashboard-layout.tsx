@@ -20,7 +20,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           sidebarOpen ? "lg:pl-64" : "lg:pl-20"
         )}
       >
-        <div className="container mx-auto p-4 lg:p-6">
+        {/* Padding top para el botón hamburguesa en móvil */}
+        <div className="container mx-auto p-4 lg:p-6 pt-16 lg:pt-6">
           {children}
         </div>
       </main>
