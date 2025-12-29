@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,6 +33,7 @@ import {
   PieChart,
   ArrowUpRight,
   ArrowDownRight,
+  Loader2,
 } from "lucide-react";
 import { generarVentasDemo } from "@/lib/demo-data";
 import { exportVentasCSV } from "@/lib/export";
@@ -40,8 +41,29 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 export default function ReportesPage() {
+  // Hook para evitar problemas de hidratación SSR
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const [periodoSeleccionado, setPeriodoSeleccionado] = useState("hoy");
   const ventas = generarVentasDemo(50);
+
+  // Pantalla de carga mientras se monta el componente
+  if (!mounted) {
+    return (
+      <DashboardLayout>
+        <div className="min-h-[60vh] flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
+            <p className="text-muted-foreground">Cargando reportes...</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   const handleExport = () => {
     exportVentasCSV(ventas);

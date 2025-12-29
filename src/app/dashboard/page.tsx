@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,16 +15,38 @@ import {
   CreditCard,
   ArrowUpRight,
   ArrowDownRight,
+  Loader2,
 } from "lucide-react";
 import { statsDemo, productosDemo, clientesDemo, generarVentasDemo } from "@/lib/demo-data";
 import Link from "next/link";
 
 export default function DashboardPage() {
+  // Hook para evitar problemas de hidratación SSR
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const ventas = generarVentasDemo(30);
   const productosStockBajo = productosDemo.filter(
     (p) => p.stock_actual <= p.stock_minimo
   );
   const ventasRecientes = ventas.slice(0, 5);
+
+  // Pantalla de carga mientras se monta el componente
+  if (!mounted) {
+    return (
+      <DashboardLayout>
+        <div className="min-h-[60vh] flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
+            <p className="text-muted-foreground">Cargando dashboard...</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   const stats = [
     {

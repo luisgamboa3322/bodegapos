@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -32,6 +32,7 @@ import {
   FileCheck,
   Download,
   Printer,
+  Loader2,
 } from "lucide-react";
 import { categoriasDemo, productosConCategoria, clientesDemo } from "@/lib/demo-data";
 import { useCartStore } from "@/lib/store";
@@ -52,6 +53,13 @@ const tiposComprobante = [
 ];
 
 export default function POSPage() {
+  // Hook para evitar problemas de hidratación SSR
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [categoriaActiva, setCategoriaActiva] = useState<string | null>(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
@@ -88,6 +96,18 @@ export default function POSPage() {
   const total = getTotal();
   const totalItems = getTotalItems();
   const vuelto = montoRecibido ? parseFloat(montoRecibido) - total : 0;
+
+  // Pantalla de carga mientras se monta el componente
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
+          <p className="text-muted-foreground">Cargando Punto de Venta...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Filtrar productos
   const productosFiltrados = useMemo(() => {

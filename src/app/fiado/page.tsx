@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { DashboardLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,6 +31,7 @@ import {
   CheckCircle,
   Phone,
   Calendar,
+  Loader2,
 } from "lucide-react";
 import { clientesDemo, generarVentasDemo } from "@/lib/demo-data";
 import { cn } from "@/lib/utils";
@@ -38,6 +39,13 @@ import { toast } from "sonner";
 import { Cliente } from "@/types";
 
 export default function FiadoPage() {
+  // Hook para evitar problemas de hidratación SSR
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [showPagoModal, setShowPagoModal] = useState(false);
   const [selectedCliente, setSelectedCliente] = useState<Cliente | null>(null);
@@ -46,6 +54,20 @@ export default function FiadoPage() {
   const clientesConFiado = useMemo(() => {
     return clientesDemo.filter((c) => c.saldo_fiado > 0);
   }, []);
+
+  // Pantalla de carga mientras se monta el componente
+  if (!mounted) {
+    return (
+      <DashboardLayout>
+        <div className="min-h-[60vh] flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
+            <p className="text-muted-foreground">Cargando control de fiado...</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   // Filtrar clientes
   const clientesFiltrados = useMemo(() => {

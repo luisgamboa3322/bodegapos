@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { DashboardLayout } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +46,7 @@ import {
   BarChart3,
   Filter,
   Download,
+  Loader2,
 } from "lucide-react";
 import { productosConCategoria, categoriasDemo } from "@/lib/demo-data";
 import { exportProductosCSV } from "@/lib/export";
@@ -53,11 +54,32 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 export default function ProductosPage() {
+  // Hook para evitar problemas de hidratación SSR
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [categoriaFilter, setCategoriaFilter] = useState<string>("all");
   const [stockFilter, setStockFilter] = useState<string>("all");
   const [showProductModal, setShowProductModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<typeof productosConCategoria[0] | null>(null);
+
+  // Pantalla de carga mientras se monta el componente
+  if (!mounted) {
+    return (
+      <DashboardLayout>
+        <div className="min-h-[60vh] flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <Loader2 className="h-12 w-12 animate-spin mx-auto text-primary" />
+            <p className="text-muted-foreground">Cargando productos...</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   const handleExport = () => {
     exportProductosCSV(productosFiltrados);
